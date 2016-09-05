@@ -2,16 +2,19 @@ package models;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
-import util.Config;
-import util.Util;
+import org.apache.log4j.Logger;
+
+import com.google.common.base.Splitter;
+
 import de.jstacs.NonParsableException;
 import de.jstacs.WrongAlphabetException;
 import de.jstacs.algorithms.optimization.termination.AbstractTerminationCondition;
 import de.jstacs.algorithms.optimization.termination.SmallDifferenceOfFunctionEvaluationsCondition;
 import de.jstacs.data.AlphabetContainer;
-import de.jstacs.data.Sample;
 import de.jstacs.io.FileManager;
 import de.jstacs.io.XMLParser;
 import de.jstacs.models.AbstractModel;
@@ -21,6 +24,7 @@ import de.jstacs.models.mixture.StrandModel;
 import de.jstacs.models.mixture.motif.SingleHiddenMotifMixture;
 import de.jstacs.models.mixture.motif.positionprior.UniformPositionPrior;
 import de.jstacs.parameters.SimpleParameter.IllegalValueException;
+import util.Config;
 
 /**
  * This class provides methods to create and handle different types of models given some {@link Properties}. It helps to
@@ -30,6 +34,7 @@ import de.jstacs.parameters.SimpleParameter.IllegalValueException;
  * 
  */
 public class ModelUtil {
+	private static Logger LOGGER = Logger.getLogger(ModelUtil.class);
 
     /**
      * This method instantiates a new untrained {@link SingleHiddenMotifMixture} from the given properties. The
@@ -60,7 +65,7 @@ public class ModelUtil {
             NonParsableException, IOException {
         if (Config.getProperty(props, "algorithm.continue", "false").asBoolean() &&
                 new File(Config.getProperty(props, "input.model.shm", "").asString()).exists()) {
-            System.out.println("Try to continue training on existing SHM");
+			LOGGER.info("Try to continue training on existing SHM");
             return getTrainedSHM(props);
         }
 
@@ -83,6 +88,12 @@ public class ModelUtil {
             motif = new PhyloBayesModel(motifLength, motifOrder, motifNewick, alphabet);
             flanking = new PhyloBackground(flankingOrder, flankingNewick, alphabet);
         }
+
+		if (Config.getProperty(props, "model.fg.condprobs", true) != null) {
+			double[][] condProbs = ((PhyloPreparedAbstractModel)motif).getCondProbs();
+			parseCondProbs(Config.getProperty(props, "model.fg.condprobs", true).asString(), condProbs);
+			((PhyloPreparedAbstractModel) motif).setCondProbs(condProbs);
+		}
 
         if (useStrandModel) {
             motif = new StrandModel(
@@ -128,31 +139,40 @@ public class ModelUtil {
         return shm;
     }
 
-    /**
-     * This method instantiates a new untrained background model from the given properties. The
-     * following properties are taken into account:
-     * <ul>
-     * <li>order
-     * <li>newick string
-     * <li>usage of {@link PhyloBackground}s or {@link AlignmentBasedBGModel}
-     * </ul>
-     * 
-     * @param props
-     * @param alphabet
-     * @return a new background model
-     * @throws IllegalArgumentException
-     * @throws IllegalValueException
-     * @throws CloneNotSupportedException
-     * @throws WrongAlphabetException
-     * @throws IOException
-     * @throws NonParsableException
-     */
+	private static void parseCondProbs(String probsString, double[][] condProbs) {
+		List<String> elements = Splitter.on(",").trimResults().splitToList(probsString);
+		Iterator<String> elementsIterator = elements.iterator();
+		for (int i = 0; i < condProbs.length; i++) {
+			for (int a = 0; a < condProbs[i].length; a++) {
+				condProbs[i][a] = Double.valueOf(elementsIterator.next());
+			}
+		}
+	}
+
+	/**
+	 * This method instantiates a new untrained background model from the given properties. The following properties are taken into account:
+	 * <ul>
+	 * <li>order
+	 * <li>newick string
+	 * <li>usage of {@link PhyloBackground}s or {@link AlignmentBasedBGModel}
+	 * </ul>
+	 * 
+	 * @param props
+	 * @param alphabet
+	 * @return a new background model
+	 * @throws IllegalArgumentException
+	 * @throws IllegalValueException
+	 * @throws CloneNotSupportedException
+	 * @throws WrongAlphabetException
+	 * @throws IOException
+	 * @throws NonParsableException
+	 */
     public static AbstractModel getNewBackground(Properties props, AlphabetContainer alphabet)
             throws IllegalArgumentException, IllegalValueException, CloneNotSupportedException, WrongAlphabetException,
             NonParsableException, IOException {
         if (Config.getProperty(props, "algorithm.continue", "false").asBoolean() &&
                 new File(Config.getProperty(props, "input.model.bg", "").asString()).exists()) {
-            System.out.println("Try to continue training on existing background");
+			LOGGER.info("Try to continue training on existing background");
             return getTrainedBackground(props);
         }
         byte order = Config.getProperty(props, "model.bg.order", "0").asByte();
@@ -214,36 +234,5 @@ public class ModelUtil {
             throw new IllegalArgumentException("Tried to load an untrained SingleHiddenMotifMixture");
         }
         return bestShm;
-    }
-
-    /**
-     * Trains a given model on a given dataset until the difference of likelihoods is smaller than eps. But minSteps are
-     * performed at least.
-     * 
-     * @param model
-     * @param data
-     * @param eps
-     * @param minSteps
-     * @param weights
-     * @throws Exception
-     */
-    public static void trainModel(Model model, Sample data, double eps, int minSteps, double[] weights)
-            throws Exception {
-        byte order = ((de.jstacs.models.AbstractModel) model).getMaximalMarkovOrder();
-        System.out.println("Start training " + model.getInstanceName() + "(" + order + ")");
-        double lastLog = Integer.MIN_VALUE, curLog = Integer.MIN_VALUE;
-
-        int i = 0;
-        while (i == 0 || i < minSteps || Math.abs(lastLog - curLog) > eps && i < 20) {
-            if (weights == null) {
-                model.train(data);
-            } else {
-                model.train(data, weights);
-            }
-            lastLog = curLog;
-            curLog = Util.sum(model.getLogProbFor(data));
-            System.out.println("Step: " + i + " | Difference = " + (curLog - lastLog));
-            i++;
-        }
     }
 }

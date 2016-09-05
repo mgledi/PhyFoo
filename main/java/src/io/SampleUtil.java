@@ -8,6 +8,8 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import com.google.common.base.Preconditions;
+
 import de.jstacs.WrongAlphabetException;
 import de.jstacs.data.AlphabetContainer;
 import de.jstacs.data.EmptySampleException;
@@ -233,6 +235,40 @@ public class SampleUtil {
         }
         return sb.toString();
     }
+
+	public static PhyloSample getDataSetBGTrain(Properties props, AlphabetContainer alphabet)
+	        throws EmptySampleException, WrongAlphabetException, WrongLengthException, IOException, WrongSequenceTypeException {
+		String dataFileFG = Config.getProperty(props, "input.dataset.bg", false).asString();
+		String newick = Config.getPropertyWithFallBack(props, false, "model.bg.newick", "model.fg.newick", "model.newick").asString();
+
+		int trainingSeqs = Config.getProperty(props, "input.dataset.bg.train", "0").asInt();
+		PhyloSample sample = SampleUtil.getDataSet(dataFileFG, newick, alphabet);
+		Preconditions.checkArgument(trainingSeqs < sample.getNumberOfElements(),
+		        "The number of alignments requested for training exceeds the number of available alignments.");
+		int splitseed = Config.getProperty(props, "input.splitseed", false).asInt();
+		if (trainingSeqs > 0) {
+			return sample.getSubSample(trainingSeqs, splitseed);
+		} else {
+			return sample;
+		}
+	}
+
+	public static PhyloSample getDataSetFGTrain(Properties props, AlphabetContainer alphabet)
+	        throws EmptySampleException, WrongAlphabetException, WrongLengthException, IOException, WrongSequenceTypeException {
+		String dataFileFG = Config.getProperty(props, "input.dataset.fg", false).asString();
+		String newick = Config.getPropertyWithFallBack(props, false, "model.bg.newick", "model.fg.newick", "model.newick").asString();
+
+		int trainingSeqs = Config.getProperty(props, "input.dataset.fg.train", "0").asInt();
+		PhyloSample sample = SampleUtil.getDataSet(dataFileFG, newick, alphabet);
+		Preconditions.checkArgument(trainingSeqs < sample.getNumberOfElements(),
+		        "The number of alignments requested for training exceeds the number of available alignments.");
+		int splitseed = Config.getProperty(props, "input.splitseed", false).asInt();
+		if (trainingSeqs > 0) {
+			return sample.getSubSample(trainingSeqs, splitseed);
+		} else {
+			return sample;
+		}
+	}
 
     public static Sample[] getDataSets(Properties props, AlphabetContainer alphabet)
             throws EmptySampleException, WrongAlphabetException, WrongLengthException, IOException,

@@ -3,6 +3,8 @@ package training;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import classification.ClassificationUtil;
 import de.jstacs.algorithms.optimization.termination.CombinedCondition;
 import de.jstacs.algorithms.optimization.termination.IterationCondition;
@@ -35,6 +37,8 @@ import util.Util;
  * 
  */
 public class PostTrainModel {
+
+	private static Logger LOGGER = Logger.getLogger(PostTrainModel.class);
 
     @SuppressWarnings("javadoc")
     public static void main(String[] args) throws Exception {
@@ -103,8 +107,8 @@ public class PostTrainModel {
         ((PhyloPreparedAbstractModel)trainingSHM.model[1]).setCondProbs(((PhyloPreparedAbstractModel)bestSHM.model[1]).getCondProbs());
         
         // train flanking model and background model
-        ModelUtil.trainModel(trainingBG, sampleTrainBG, 1e-3, 0, null); // train BG-Model on background
-        ModelUtil.trainModel(trainingSHM.model[1], sampleTrainFG, 1e-3, 0, null); // train flanking Model on foreground
+		TrainingUtil.trainModel(trainingBG, sampleTrainBG, 1e-3, 0, null); // train BG-Model on background
+		TrainingUtil.trainModel(trainingSHM.model[1], sampleTrainFG, 1e-3, 0, null); // train flanking Model on foreground
         
         // train on extracted gammas
         if (Config.getProperty(props, "algorithm.maximization_only", "true").asBoolean()) {
@@ -113,15 +117,16 @@ public class PostTrainModel {
             trainingSHM.train(sampleTrainFG);
         }
         
-        System.out.println("Writing SHM to " + modelFileSHM);
+		LOGGER.info("Writing SHM model to " + modelFileSHM);
 		FileUtil.writeFile(modelFileSHM, trainingSHM.toXML().toString());
+		LOGGER.info("Writing BG model to " + modelFileBG);
 		FileUtil.writeFile(modelFileBG, trainingBG.toXML().toString());
         // perform classification tests
         
 
         PhyloBayesModel.ENABLE_CACHING = false;
         PhyloBayesModel.CLONING_ALLOWED = false;
-        System.out.println("Start tests on " + sampleTestFG.getNumberOfElements() + " FG-seqs and " + sampleTestBG.getNumberOfElements() + " BG-seqs.");
+		LOGGER.info("Start tests on " + sampleTestFG.getNumberOfElements() + " FG-seqs and " + sampleTestBG.getNumberOfElements() + " BG-seqs.");
         double[] classTest = ClassificationUtil
                 .performClassificationTest(newSHM, trainingBG, sampleTestFG, sampleTestBG);
 
@@ -131,7 +136,7 @@ public class PostTrainModel {
         }
         
         // store model and results
-        System.out.println("Writing data to " + resultFile);
+		LOGGER.info("Writing results to " + resultFile);
 		FileUtil.writeFile(resultFile, sb.toString());
 
     }

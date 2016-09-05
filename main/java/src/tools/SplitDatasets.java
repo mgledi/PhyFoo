@@ -1,9 +1,9 @@
 package tools;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 import de.jstacs.WrongAlphabetException;
 import de.jstacs.data.AlphabetContainer;
@@ -13,6 +13,7 @@ import de.jstacs.data.WrongLengthException;
 import de.jstacs.data.alphabets.DoubleSymbolException;
 import de.jstacs.data.alphabets.UnobservableDNAAlphabet;
 import de.jstacs.data.sequences.WrongSequenceTypeException;
+import io.FileUtil;
 import io.SampleUtil;
 import util.Config;
 
@@ -37,6 +38,7 @@ import util.Config;
  * 
  */
 public class SplitDatasets {
+	private static Logger LOGGER = Logger.getLogger(SplitDatasets.class);
     @SuppressWarnings("javadoc")
     public static void main(String[] args)
             throws EmptySampleException, WrongAlphabetException, WrongLengthException, IOException,
@@ -50,18 +52,13 @@ public class SplitDatasets {
         // get datasets
         Sample[] samples = SampleUtil.getDataSets(props, alphabet);
 
-        write(Config.getProperty(props, "output.dataset.fg.train", false).toString(), SampleUtil.toFasta(samples[0]));
-        write(Config.getProperty(props, "output.dataset.fg.test", false).toString(), SampleUtil.toFasta(samples[1]));
-        write(Config.getProperty(props, "output.dataset.bg.train", false).toString(), SampleUtil.toFasta(samples[2]));
-        write(Config.getProperty(props, "output.dataset.bg.test", false).toString(), SampleUtil.toFasta(samples[3]));
-
-        System.out.println("All files written");
-    }
-
-    private static void write(String filename, String fasta) throws IOException {
-        System.out.println("Write fasta to " + filename);
-        FileWriter fw = new FileWriter(new File(filename));
-        fw.append(fasta);
-        fw.close();
+		LOGGER.info("Writing fasta for positive training dataset to " + Config.getProperty(props, "output.dataset.fg.train", false).toString());
+		FileUtil.writeFile(Config.getProperty(props, "output.dataset.fg.train", false).toString(), SampleUtil.toFasta(samples[0]));
+		LOGGER.info("Writing fasta for positive testing dataset to " + Config.getProperty(props, "output.dataset.fg.test", false).toString());
+		FileUtil.writeFile(Config.getProperty(props, "output.dataset.fg.test", false).toString(), SampleUtil.toFasta(samples[1]));
+		LOGGER.info("Writing fasta for negative traing dataset to " + Config.getProperty(props, "output.dataset.bg.train", false).toString());
+		FileUtil.writeFile(Config.getProperty(props, "output.dataset.bg.train", false).toString(), SampleUtil.toFasta(samples[2]));
+		LOGGER.info("Writing fasta for negative testing dataset to " + Config.getProperty(props, "output.dataset.bg.test", false).toString());
+		FileUtil.writeFile(Config.getProperty(props, "output.dataset.bg.test", false).toString(), SampleUtil.toFasta(samples[3]));
     }
 }
