@@ -110,7 +110,7 @@ public abstract class AbstractAlignmentBasedModel extends PhyloPreparedAbstractM
         return getCondProbs();
     }
 
-    /** @return a pointer to the underlying conditional probability array at position i */
+	/** @return a pointer to the underlying conditional probabilities */
     @Override
     public double[][] getCondProbs() {
         return condProb;

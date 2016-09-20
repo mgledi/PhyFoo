@@ -1,6 +1,5 @@
 package tools;
 
-import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -20,6 +19,7 @@ import models.PhyloBayesModel;
 import models.PhyloPreparedAbstractModel;
 import training.TrainingUtil;
 import util.Config;
+import util.R;
 
 /**
  * Example configuration: --basedir="/Dropbox/promotion/edgeLengthTest_FS81alpha/biological_tests/CTCF_gapless" <br>
@@ -82,10 +82,10 @@ public class Classification {
 		sb.append(-1).append("\n");
         sb.append(areaUnderROC).append("\n");
         sb.append(areaUnderPR).append("\n");
-		sb.append("ROC" + "[['x']]").append(Arrays.toString(getColumn(rocCurve, 0))).append("\n");
-		sb.append("ROC" + "[['y']]").append(Arrays.toString(getColumn(rocCurve, 1))).append("\n");
-		sb.append("PR" + "[['x']]").append(Arrays.toString(getColumn(prCurve, 0))).append("\n");
-		sb.append("PR" + "[['y']]").append(Arrays.toString(getColumn(prCurve, 1))).append("\n");
+		sb.append("ROC" + "[['x']]=").append(R.getVector(getColumn(rocCurve, 0))).append("\n");
+		sb.append("ROC" + "[['y']]=").append(R.getVector(getColumn(rocCurve, 1))).append("\n");
+		sb.append("PR" + "[['x']]=").append(R.getVector(getColumn(prCurve, 0))).append("\n");
+		sb.append("PR" + "[['y']]=").append(R.getVector(getColumn(prCurve, 1))).append("\n");
         // store model and results
 		LOGGER.info(sb);
 

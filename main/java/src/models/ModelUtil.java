@@ -89,7 +89,7 @@ public class ModelUtil {
             flanking = new PhyloBackground(flankingOrder, flankingNewick, alphabet);
         }
 
-		if (Config.getProperty(props, "model.fg.condprobs", true) != null) {
+		if (!Config.getProperty(props, "model.fg.condprobs", "").asString().isEmpty()) {
 			double[][] condProbs = ((PhyloPreparedAbstractModel)motif).getCondProbs();
 			parseCondProbs(Config.getProperty(props, "model.fg.condprobs", true).asString(), condProbs);
 			((PhyloPreparedAbstractModel) motif).setCondProbs(condProbs);
