@@ -1,0 +1,88 @@
+
+====== data_HKY2_1.0.bg
+Prob. Distr: 
+0.25	0.25	0.25	0.25
+Tree:
+(SPECIES_0:0.2,SPECIES_1:0.2,SPECIES_2:0.2,SPECIES_3:0.2,SPECIES_4:0.2)
+Evolutionary Model: 
+HKY(2)  # transversion are 2 times larger than transitions
+LENGTH:
+300 to 400
+Number of alignments: 6000
+
+====== data_HKY2_1.0.fg
+=== Flanking alignments
+Prob. Distr:
+0.25    0.25    0.25    0.25
+Tree:
+(SPECIES_0:0.2,SPECIES_1:0.2,SPECIES_2:0.2,SPECIES_3:0.2,SPECIES_4:0.2)
+Evolutionary Model:
+HKY(2) # transversion are 2 times larger than transitions
+Length:
+300 to 400
+Number of alignments: 
+750
+Zoops: 
+1.0
+
+=== Motif alignments
+PWM (probability distributions):
+0.0197  0.088   0.4119  0.4804
+0.1038  0.1426  0.5738  0.1797
+0.074   0.0419  0.7108  0.1733
+0.2639  0.5022  0.0618  0.1721
+0.0692  0.3992  0.274   0.2575
+0.2461  0.4205  0.3137  0.0197
+0.0322  0.6615  0.1202  0.1861
+0.2187  0.3172  0.0148  0.4493
+0.612   0.0727  0.1311  0.1842
+0.1408  0.1203  0.2931  0.4458
+Tree:
+(SPECIES_0:0.2,SPECIES_1:0.2,SPECIES_2:0.2,SPECIES_3:0.2,SPECIES_4:0.2)
+Evolutionary Model:
+HKY(2) # transversion are 2 times larger than transitions
+
+
+====== data_HKY0.5_1.0.bg
+Prob. Distr:
+0.25    0.25    0.25    0.25
+Tree:
+(SPECIES_0:0.4,SPECIES_1:0.4,SPECIES_2:0.4,SPECIES_3:0.4,SPECIES_4:0.4)
+Evolutionary Model:
+HKY(0.5)  # transversion are by a factor 2 smaller than transitions
+LENGTH:
+300 to 400
+Number of alignments: 6000
+
+====== data_HKY0.5_1.0.fg
+=== Flanking alignments
+Prob. Distr:
+0.25    0.25    0.25    0.25
+Tree:
+(SPECIES_0:0.4,SPECIES_1:0.4,SPECIES_2:0.4,SPECIES_3:0.4,SPECIES_4:0.4)
+Evolutionary Model:
+HKY(0.5)  # transversion are by a factor 2 smaller than transitions
+Length:
+300 to 400
+Number of alignments:
+750
+Zoops:
+1.0
+
+=== Motif alignments
+PWM (probability distributions):
+0.2796  0.2055  0.4956  0.0193
+0.1826  0.1004  0.2019  0.5151
+0.2623  0.2253  0.0393  0.4731
+0.1259  0.0427  0.7794  0.0521
+2.0E-4  0.3092  0.2308  0.4598
+0.2475  0.0854  0.5354  0.1317
+0.2401  0.434   0.0774  0.2485
+0.4076  0.3094  0.1182  0.1648
+0.0163  0.4284  0.0281  0.5272
+0.2877  0.2879  0.2382  0.1862
+Tree:
+(SPECIES_0:0.4,SPECIES_1:0.4,SPECIES_2:0.4,SPECIES_3:0.4,SPECIES_4:0.4)
+Evolutionary Model:
+HKY(0.5)  # transversion are by a factor 2 smaller than transitions
+
